@@ -105,16 +105,33 @@ type EntryHeap []*Entry
 
 func (h EntryHeap) Len() int { return len(h) }
 func (h EntryHeap) Less(i, j int) bool {
-	j1, _ := json.Marshal(h[i].Job)
+	j1, err := json.Marshal(h[i].Job)
+	if err != nil {
+		return true
+	}
 	inf1 := new(DKJob)
-	json.Unmarshal([]byte(j1), inf1)
-	j2, _ := json.Marshal(h[j].Job)
+	err = json.Unmarshal([]byte(j1), inf1)
+	if err != nil {
+		return true
+	}
+	j2, err := json.Marshal(h[j].Job)
+	if err != nil {
+		return true
+	}
 	inf2 := new(DKJob)
-	json.Unmarshal([]byte(j2), inf2)
-	x, _ := strconv.Atoi(inf1.Metadata["priority"])
-	y, _ := strconv.Atoi(inf2.Metadata["priority"])
+	err = json.Unmarshal([]byte(j2), inf2)
+	if err != nil {
+		return true
+	}
+	x, err := strconv.Atoi(inf1.Metadata["priority"])
+	if err != nil {
+		return true
+	}
+	y, err := strconv.Atoi(inf2.Metadata["priority"])
+	if err != nil {
+		return true
+	}
 	return x > y
-
 }                                 // 小顶堆，返回值决定是否交换元素
 func (h EntryHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
