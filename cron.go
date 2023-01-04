@@ -105,34 +105,46 @@ type EntryHeap []*Entry
 
 func (h EntryHeap) Len() int { return len(h) }
 func (h EntryHeap) Less(i, j int) bool {
-	j1, err := json.Marshal(h[i].Job)
+	var x = 0
+	var y = 0
+
+	s1, err := json.Marshal(h[i].Job)
 	if err != nil {
-		return true
+		return false
 	}
 	inf1 := new(DKJob)
-	err = json.Unmarshal([]byte(j1), inf1)
+	err = json.Unmarshal(s1, inf1)
 	if err != nil {
-		return true
+		return false
 	}
-	j2, err := json.Marshal(h[j].Job)
+	p1, c1 := inf1.Metadata["priority"]
+	if c1 {
+		x, err = strconv.Atoi(p1)
+		if err != nil {
+			return false
+		}
+	}
+
+	s2, err := json.Marshal(h[j].Job)
 	if err != nil {
-		return true
+		return false
 	}
 	inf2 := new(DKJob)
-	err = json.Unmarshal([]byte(j2), inf2)
+	err = json.Unmarshal(s2, inf2)
 	if err != nil {
-		return true
+		return false
 	}
-	x, err := strconv.Atoi(inf1.Metadata["priority"])
-	if err != nil {
-		return true
+	p2, c2 := inf2.Metadata["priority"]
+	if c2 {
+		y, err = strconv.Atoi(p2)
+		if err != nil {
+			return false
+		}
 	}
-	y, err := strconv.Atoi(inf2.Metadata["priority"])
-	if err != nil {
-		return true
-	}
+
 	return x > y
-}                                 // 小顶堆，返回值决定是否交换元素
+}
+
 func (h EntryHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
 func (h *EntryHeap) Push(x interface{}) {
